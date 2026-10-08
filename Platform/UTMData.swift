@@ -497,6 +497,10 @@ enum AlertItem: Identifiable {
     /// - Parameter vm: VM to delete
     /// - Returns: Index of item removed in VM list or nil if not in list
     @discardableResult func delete(vm: VMData, alsoRegistry: Bool = true) async throws -> Int? {
+        // a moved image keeps its identity, so only deleting one for good orphans its children
+        guard !alsoRegistry || children(of: vm).isEmpty else {
+            throw UTMDataError.imageHasChildren
+        }
         if vm.isLoaded {
             try fileManager.removeItem(at: vm.pathUrl)
         }
@@ -540,6 +544,156 @@ enum AlertItem: Identifiable {
         return newVM
     }
     
+    // MARK: - Images
+
+    /// Freeze a stopped VM into a new image which the VM is then based on
+    /// - Parameters:
+    ///   - vm: VM to freeze
+    ///   - labels: Names for the new image
+    /// - Returns: The new image
+    @discardableResult func commit(vm: VMData, labels: [String]) async throws -> VMData {
+        guard let information = vm.config?.information, information.kind == .virtualMachine else {
+            throw UTMDataError.notVirtualMachine
+        }
+        guard vm.isModifyAllowed && !vm.hasSuspendState else {
+            throw UTMDataError.virtualMachineNotShutDown
+        }
+        let base = String.localizedStringWithFormat(NSLocalizedString("%@ Image", comment: "UTMData"), information.name)
+        let image = try await copyBundle(of: vm, named: newDefaultVMName(base: base))
+        do {
+            // snapshots of the VM would let a derived VM go back to before the image existed
+            try await deleteAllSnapshots(of: image)
+            updateInformation(of: image) { imageInformation in
+                imageInformation.kind = .image
+                imageInformation.parentUUID = information.parentUUID
+                imageInformation.labels = labels
+            }
+            try await image.save()
+        } catch {
+            try? fileManager.removeItem(at: image.pathUrl)
+            throw error
+        }
+        updateInformation(of: vm) { $0.parentUUID = image.id }
+        try await save(vm: vm)
+        listAdd(vm: image, at: virtualMachines.firstIndex(of: vm))
+        return image
+    }
+
+    /// Create a new VM from an image
+    /// - Parameter image: Image to start from
+    /// - Returns: The new VM
+    @discardableResult func derive(from image: VMData) async throws -> VMData {
+        guard let information = image.config?.information, information.kind == .image else {
+            throw UTMDataError.notImage
+        }
+        let newVM = try await copyBundle(of: image, named: newDefaultVMName(base: image.detailsTitleLabel))
+        updateInformation(of: newVM) { newInformation in
+            newInformation.kind = .virtualMachine
+            newInformation.parentUUID = information.uuid
+            newInformation.labels = []
+        }
+        regenerateCollidingMacAddresses(for: newVM)
+        try await newVM.save()
+        var index = virtualMachines.firstIndex(of: image)
+        if index != nil {
+            index! += 1
+        }
+        listAdd(vm: newVM, at: index)
+        listSelect(vm: newVM)
+        return newVM
+    }
+
+    /// Replace the names of an image
+    /// - Parameters:
+    ///   - labels: New names
+    ///   - image: Image to rename
+    func setLabels(_ labels: [String], for image: VMData) async throws {
+        guard image.config?.information.kind == .image else {
+            throw UTMDataError.notImage
+        }
+        updateInformation(of: image) { $0.labels = labels }
+        try await save(vm: image)
+    }
+
+    /// Images and VMs derived directly from an image
+    /// - Parameter image: Parent image
+    /// - Returns: Children in list order
+    func children(of image: VMData) -> [VMData] {
+        guard let uuid = image.config?.information.uuid else {
+            return []
+        }
+        return virtualMachines.filter { $0.config?.information.parentUUID == uuid }
+    }
+
+    /// Image a VM or image was derived from, if it is in the list
+    /// - Parameter vm: VM or image
+    /// - Returns: Parent image
+    func parent(of vm: VMData) -> VMData? {
+        guard let parentUUID = vm.config?.information.parentUUID else {
+            return nil
+        }
+        return virtualMachines.first { $0.config?.information.uuid == parentUUID }
+    }
+
+    private func copyBundle(of vm: VMData, named name: String) async throws -> VMData {
+        let newPath = ConcreteVirtualMachine.virtualMachinePath(for: name, in: documentsURL)
+        try await copyItemWithCopyfile(at: vm.pathUrl, to: newPath)
+        guard let newVM = try? VMData(url: newPath) else {
+            try? fileManager.removeItem(at: newPath)
+            throw UTMDataError.cloneFailed
+        }
+        newVM.wrapped!.changeUuid(to: UUID(), name: name, copyingEntry: nil)
+        return newVM
+    }
+
+    private func updateInformation(of vm: VMData, _ update: (inout UTMConfigurationInfo) -> Void) {
+        if let config = vm.config as? UTMQemuConfiguration {
+            update(&config.information)
+        }
+        #if os(macOS)
+        if let config = vm.config as? UTMAppleConfiguration {
+            update(&config.information)
+        }
+        #endif
+    }
+
+    private func deleteAllSnapshots(of vm: VMData) async throws {
+        guard let wrapped = vm.wrapped, UTMSnapshotService.isSupported(for: wrapped) else {
+            return
+        }
+        for snapshot in UTMSnapshotService.snapshots(for: wrapped) {
+            try await UTMSnapshotService.deleteSnapshot(snapshot.id, on: wrapped)
+        }
+    }
+
+    /// VMs derived from the same image start with the same addresses, which only matters once two of them run
+    private func regenerateCollidingMacAddresses(for vm: VMData) {
+        let others = virtualMachines.filter { $0 != vm && $0.config?.information.kind == .virtualMachine }
+        let inUse = Set(others.flatMap { other -> [String] in
+            if let config = other.config as? UTMQemuConfiguration {
+                return config.networks.map { $0.macAddress.lowercased() }
+            }
+            #if os(macOS)
+            if let config = other.config as? UTMAppleConfiguration {
+                return config.networks.map { $0.macAddress.lowercased() }
+            }
+            #endif
+            return []
+        })
+        if let config = vm.config as? UTMQemuConfiguration {
+            for i in config.networks.indices where inUse.contains(config.networks[i].macAddress.lowercased()) {
+                config.networks[i].macAddress = UTMQemuConfigurationNetwork.randomMacAddress()
+            }
+        }
+        #if os(macOS)
+        if let config = vm.config as? UTMAppleConfiguration {
+            for i in config.networks.indices where inUse.contains(config.networks[i].macAddress.lowercased()) {
+                config.networks[i].macAddress = UTMQemuConfigurationNetwork.randomMacAddress()
+            }
+        }
+        #endif
+    }
+
     /// Save a copy of the VM and all data to arbitary location
     /// - Parameters:
     ///   - vm: VM to copy
@@ -1202,6 +1356,10 @@ enum UTMDataError: Error {
     case notImplemented
     case reconnectFailed
     case driveHasSnapshots
+    case notVirtualMachine
+    case notImage
+    case virtualMachineNotShutDown
+    case imageHasChildren
 }
 
 extension UTMDataError: LocalizedError {
@@ -1237,6 +1395,14 @@ extension UTMDataError: LocalizedError {
             return NSLocalizedString("Failed to reconnect to the server.", comment: "UTMData")
         case .driveHasSnapshots:
             return NSLocalizedString("Space cannot be reclaimed from a drive while it holds snapshots or a suspended state.", comment: "UTMData")
+        case .notVirtualMachine:
+            return NSLocalizedString("This is an image, not a virtual machine.", comment: "UTMData")
+        case .notImage:
+            return NSLocalizedString("This is a virtual machine, not an image.", comment: "UTMData")
+        case .virtualMachineNotShutDown:
+            return NSLocalizedString("Shut down the virtual machine before creating an image from it.", comment: "UTMData")
+        case .imageHasChildren:
+            return NSLocalizedString("This image cannot be deleted while other images or virtual machines are created from it.", comment: "UTMData")
         }
     }
 }

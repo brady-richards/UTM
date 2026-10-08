@@ -222,6 +222,9 @@ final class UTMAppleVirtualMachine: UTMVirtualMachine {
     ///   - options: Options for startup
     ///   - guestProvisioning: If set, account to create in the guest. This is never saved.
     func start(options: UTMVirtualMachineStartOptions, guestProvisioning: UTMAppleGuestProvisioningOptions?) async throws {
+        guard await config.information.kind != .image else {
+            throw UTMVirtualMachineError.imageNotRunnable
+        }
         var vzGuestProvisioning: Any?
         if let guestProvisioning = guestProvisioning {
             // this must fail before the error handling below which discards any saved state

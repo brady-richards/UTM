@@ -22,6 +22,8 @@ struct VMContextMenuModifier: ViewModifier {
     @State private var showSharePopup = false
     @State private var confirmAction: ConfirmAction?
     @State private var shareItem: VMShareItemModifier.ShareItem?
+    @State private var isCommitPresented = false
+    @State private var isLabelsPresented = false
     
     func body(content: Content) -> some View {
         bodyFull(content: content)
@@ -46,10 +48,27 @@ struct VMContextMenuModifier: ViewModifier {
                 data.edit(vm: vm)
             } label: {
                 Label("Edit", systemImage: "slider.horizontal.3")
-            }.disabled(vm.hasSuspendState || !vm.isModifyAllowed)
+            }.disabled(vm.hasSuspendState || !vm.isModifyAllowed || vm.isImage)
             .help("Modify settings for this VM.")
             #endif
-            if vm.hasSuspendState || !vm.isStopped {
+            if vm.isImage {
+                Divider()
+                #if !WITH_REMOTE // FIXME: implement remote feature
+                Button {
+                    data.busyWorkAsync {
+                        try await data.derive(from: vm)
+                    }
+                } label: {
+                    Label("New VM from Image", systemImage: "plus.square.on.square")
+                }.help("Create a new VM that starts from this image.")
+                Button {
+                    isLabelsPresented.toggle()
+                } label: {
+                    Label("Edit Names…", systemImage: "tag")
+                }.help("Change the names this image is shown with.")
+                #endif
+                Divider()
+            } else if vm.hasSuspendState || !vm.isStopped {
                 Button {
                     confirmAction = .confirmStopVM(vm: vm)
                 } label: {
@@ -117,11 +136,19 @@ struct VMContextMenuModifier: ViewModifier {
                 .help("Move this VM from internal storage to elsewhere.")
             }
             #endif
-            Button {
-                confirmAction = .confirmCloneVM(vm: vm)
-            } label: {
-                Label("Clone…", systemImage: "doc.on.doc")
-            }.help("Duplicate this VM along with all its data.")
+            if !vm.isImage {
+                Button {
+                    confirmAction = .confirmCloneVM(vm: vm)
+                } label: {
+                    Label("Clone…", systemImage: "doc.on.doc")
+                }.help("Duplicate this VM along with all its data.")
+                Button {
+                    isCommitPresented.toggle()
+                } label: {
+                    Label("Create Image…", systemImage: "square.stack.3d.up")
+                }.disabled(vm.hasSuspendState || !vm.isModifyAllowed)
+                .help("Save this VM as an image that new VMs can be created from.")
+            }
             Button {
                 data.busyWorkAsync {
                     try await data.template(vm: vm)
@@ -146,6 +173,20 @@ struct VMContextMenuModifier: ViewModifier {
                 .help("Delete this VM and all its data.")
             }
             #endif
+        }
+        .sheet(isPresented: $isCommitPresented) {
+            VMImageLabelsView(title: "Name the new image", confirmTitle: "Create Image", text: "") { labels in
+                data.busyWorkAsync {
+                    try await data.commit(vm: vm, labels: labels)
+                }
+            }
+        }
+        .sheet(isPresented: $isLabelsPresented) {
+            VMImageLabelsView(title: "Names for this image", confirmTitle: "Save", text: vm.detailsLabels.joined(separator: ", ")) { labels in
+                data.busyWorkAsync {
+                    try await data.setLabels(labels, for: vm)
+                }
+            }
         }
         .modifier(VMShareItemModifier(isPresented: $showSharePopup, shareItem: shareItem))
         .modifier(VMConfirmActionModifier(confirmAction: $confirmAction) { action in

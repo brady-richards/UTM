@@ -356,6 +356,21 @@ extension VMData {
         config?.information.iconURL ?? nil
     }
     
+    /// Frozen image that VMs are derived from instead of a runnable VM
+    var isImage: Bool {
+        config?.information.kind == .image
+    }
+
+    /// Names of an image, empty for a VM
+    var detailsLabels: [String] {
+        config?.information.labels ?? []
+    }
+
+    /// Name of an image as it is shown where a VM refers to it
+    var detailsImageLabel: String {
+        detailsLabels.first ?? detailsTitleLabel
+    }
+
     /// Display user-specified notes for UI elements
     var detailsNotes: String? {
         config?.information.notes ?? nil

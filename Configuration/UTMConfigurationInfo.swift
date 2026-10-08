@@ -33,12 +33,29 @@ struct UTMConfigurationInfo: Codable {
     /// Random identifier not accessible by the user.
     var uuid: UUID = UUID()
     
+    /// A runnable virtual machine, or a frozen image that virtual machines are derived from.
+    var kind: Kind = .virtualMachine
+    
+    /// Identifier of the image this was derived from, `nil` if it was not derived from one.
+    var parentUUID: UUID?
+    
+    /// User specified names for an image.
+    var labels: [String] = []
+    
+    enum Kind: String, Codable {
+        case virtualMachine = "VirtualMachine"
+        case image = "Image"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name = "Name"
         case icon = "Icon"
         case isIconCustom = "IconCustom"
         case notes = "Notes"
         case uuid = "UUID"
+        case kind = "Kind"
+        case parentUUID = "ParentUUID"
+        case labels = "Labels"
     }
     
     init() {
@@ -59,6 +76,9 @@ struct UTMConfigurationInfo: Codable {
         }
         notes = try values.decodeIfPresent(String.self, forKey: .notes)
         uuid = try values.decode(UUID.self, forKey: .uuid)
+        kind = try values.decodeIfPresent(Kind.self, forKey: .kind) ?? .virtualMachine
+        parentUUID = try values.decodeIfPresent(UUID.self, forKey: .parentUUID)
+        labels = try values.decodeIfPresent([String].self, forKey: .labels) ?? []
     }
     
     func encode(to encoder: Encoder) throws {
@@ -75,6 +95,13 @@ struct UTMConfigurationInfo: Codable {
         }
         try container.encodeIfPresent(notes, forKey: .notes)
         try container.encode(uuid, forKey: .uuid)
+        if kind != .virtualMachine {
+            try container.encode(kind, forKey: .kind)
+        }
+        try container.encodeIfPresent(parentUUID, forKey: .parentUUID)
+        if !labels.isEmpty {
+            try container.encode(labels, forKey: .labels)
+        }
     }
     
     static func builtinIcon(named name: String) -> URL? {

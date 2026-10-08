@@ -485,6 +485,9 @@ extension UTMQemuVirtualMachine {
     }
     
     func start(options: UTMVirtualMachineStartOptions = []) async throws {
+        guard await config.information.kind != .image else {
+            throw UTMVirtualMachineError.imageNotRunnable
+        }
         guard state == .stopped else {
             throw UTMQemuVirtualMachineError.invalidVmState
         }

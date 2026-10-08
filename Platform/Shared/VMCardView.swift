@@ -34,18 +34,45 @@ struct VMCardView: View {
                                     .resizable()
                                     .frame(width: 8, height: 8)
                                     .aspectRatio(contentMode: .fit), alignment: .bottomLeading)
+            } else if vm.isImage {
+                Logo(logo: PlatformImage(contentsOfURL: vm.detailsIconUrl))
+                    .opacity(0.5)
+                    .overlay(Image(systemName: "square.stack.3d.up.fill")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                                .aspectRatio(contentMode: .fit), alignment: .bottomTrailing)
             } else {
                 Logo(logo: PlatformImage(contentsOfURL: vm.detailsIconUrl))
             }
             VStack(alignment: .leading) {
-                Text(vm.detailsTitleLabel)
+                Text(vm.isImage ? vm.detailsImageLabel : vm.detailsTitleLabel)
                     .font(.headline)
-                Text(vm.detailsSubtitleLabel)
-                    .font(.subheadline)
+                if vm.isImage && vm.detailsLabels.count > 1 {
+                    Text(vm.detailsLabels.dropFirst().joined(separator: ", "))
+                        .font(.subheadline)
+                } else if !vm.isImage, let parent = data.parent(of: vm) {
+                    Text(String.localizedStringWithFormat(NSLocalizedString("from %@", comment: "VMCardView"), parent.detailsImageLabel))
+                        .font(.subheadline)
+                } else {
+                    Text(vm.detailsSubtitleLabel)
+                        .font(.subheadline)
+                }
             }.lineLimit(1)
             .truncationMode(.tail)
             Spacer()
-            if vm.isStopped {
+            if vm.isImage {
+                #if !os(visionOS) && !WITH_REMOTE // tap target too small, FIXME: implement remote feature
+                Button {
+                    data.busyWorkAsync {
+                        try await data.derive(from: vm)
+                    }
+                } label: {
+                    Label("New VM from Image", systemImage: "plus.circle")
+                        .font(.largeTitle)
+                        .labelStyle(.iconOnly)
+                }.help("Create a new VM from this image.")
+                #endif
+            } else if vm.isStopped {
                 #if !os(visionOS) // tap target too small
                 Button {
                     data.run(vm: vm)
@@ -62,11 +89,15 @@ struct VMCardView: View {
         .buttonStyle(.plain)
         #if os(macOS)
         .onDoubleClick {
-            data.run(vm: vm)
+            if !vm.isImage {
+                data.run(vm: vm)
+            }
         }
         #else
         .simultaneousGesture(TapGesture(count: 2).onEnded {
-            data.run(vm: vm)
+            if !vm.isImage {
+                data.run(vm: vm)
+            }
         })
         #endif
     }

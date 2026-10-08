@@ -179,8 +179,11 @@
 		8471772927CD3CAB00D3A50B /* DetailedSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8471772727CD3CAB00D3A50B /* DetailedSection.swift */; };
 		8471772A27CD3CAB00D3A50B /* DetailedSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8471772727CD3CAB00D3A50B /* DetailedSection.swift */; };
 		847BF9AA2A49C783000BD9AA /* VMData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847BF9A92A49C783000BD9AA /* VMData.swift */; };
+		8A16BD308DC4F954A26C392E /* VMLineageGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */; };
 		847BF9AB2A49C783000BD9AA /* VMData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847BF9A92A49C783000BD9AA /* VMData.swift */; };
+		170CC72ECF3084DE404AC776 /* VMLineageGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */; };
 		847BF9AC2A49C783000BD9AA /* VMData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847BF9A92A49C783000BD9AA /* VMData.swift */; };
+		1C672454226E81C3803CDB99 /* VMLineageGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */; };
 		84818C0C2898A07A009EDB67 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84818C0B2898A07A009EDB67 /* AVFAudio.framework */; };
 		84818C0D2898A07F009EDB67 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84818C0B2898A07A009EDB67 /* AVFAudio.framework */; };
 		848308D5278A1F2200E3E474 /* Virtualization.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 848308D4278A1F2200E3E474 /* Virtualization.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -642,6 +645,7 @@
 		CE2D956924AD4F990059923A /* VMPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954224AD4F980059923A /* VMPlaceholderView.swift */; };
 		CE2D956A24AD4F990059923A /* VMPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954224AD4F980059923A /* VMPlaceholderView.swift */; };
 		CE2D956C24AD4F990059923A /* VMCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954324AD4F980059923A /* VMCardView.swift */; };
+		00AA6622411386A40C75F2D2 /* VMLineageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E265139F371CE7B5563277 /* VMLineageViews.swift */; };
 		CE2D956F24AD4F990059923A /* VMRemovableDrivesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954524AD4F980059923A /* VMRemovableDrivesView.swift */; };
 		CE2D957024AD4F990059923A /* VMRemovableDrivesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954524AD4F980059923A /* VMRemovableDrivesView.swift */; };
 		CE2D957124AD4F990059923A /* UTMExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954624AD4F980059923A /* UTMExtensions.swift */; };
@@ -662,6 +666,7 @@
 		CE2D958A24AD4F990059923A /* VMConfigSystemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D955324AD4F980059923A /* VMConfigSystemView.swift */; };
 		CE2D958E24AD4F990059923A /* UTMApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D955524AD4F980059923A /* UTMApp.swift */; };
 		CE2D958F24AD4FF00059923A /* VMCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954324AD4F980059923A /* VMCardView.swift */; };
+		89E3CAEF1A868A31A175164D /* VMLineageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E265139F371CE7B5563277 /* VMLineageViews.swift */; };
 		CE2D959024AD50D50059923A /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 521F3EFB2414F73800130500 /* Localizable.strings */; };
 		CE30F93630200C2000024DB2 /* dxmt-native.framework in Embed Libraries */ = {isa = PBXBuildFile; fileRef = CEA3EDE93016810500AAA8E4 /* dxmt-native.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE30F93730200C3300024DB2 /* dxmt-native.framework in Embed Libraries */ = {isa = PBXBuildFile; fileRef = CEA3EDE93016810500AAA8E4 /* dxmt-native.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -828,6 +833,7 @@
 		CEA45EF9263519B5002FA97D /* VMDisplayMetalViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5286EC94243748C3007E6CBC /* VMDisplayMetalViewController.m */; };
 		CEA45EFC263519B5002FA97D /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB63A7524F4654400CAF323 /* Main.swift */; };
 		CEA45F00263519B5002FA97D /* VMCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954324AD4F980059923A /* VMCardView.swift */; };
+		9603DB5D487F4A5AD0702F7D /* VMLineageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E265139F371CE7B5563277 /* VMLineageViews.swift */; };
 		CEA45F01263519B5002FA97D /* UTMLegacyQemuConfiguration+Sharing.m in Sources */ = {isa = PBXBuildFile; fileRef = CE059DC4243BFA3200338317 /* UTMLegacyQemuConfiguration+Sharing.m */; };
 		CEA45F08263519B5002FA97D /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8813D224CD230300532628 /* ActivityView.swift */; };
 		CEA45F0A263519B5002FA97D /* UTMPasteboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEDF83F8258AE24E0030E4AC /* UTMPasteboard.swift */; };
@@ -1074,6 +1080,7 @@
 		CEF7F59B2AEEDCC400E34952 /* UTMQemuConfigurationSharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8443EFF928456F3B00B2E6E2 /* UTMQemuConfigurationSharing.swift */; };
 		CEF7F59C2AEEDCC400E34952 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE772AAB25C8B0F600E4E379 /* ContentView.swift */; };
 		CEF7F59D2AEEDCC400E34952 /* VMData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847BF9A92A49C783000BD9AA /* VMData.swift */; };
+		FFB5FF047BC9511FAA6138E8 /* VMLineageGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */; };
 		CEF7F59E2AEEDCC400E34952 /* UTMLegacyQemuConfiguration+System.m in Sources */ = {isa = PBXBuildFile; fileRef = CE5425332437C22A00E520F7 /* UTMLegacyQemuConfiguration+System.m */; };
 		CEF7F59F2AEEDCC400E34952 /* UTMQemuConfigurationNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843BF82F2844853E0029D60D /* UTMQemuConfigurationNetwork.swift */; };
 		CEF7F5A12AEEDCC400E34952 /* VMWizardDrivesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBE820226A4C1B5007AAB12 /* VMWizardDrivesView.swift */; };
@@ -1185,6 +1192,7 @@
 		CEF7F6162AEEDCC400E34952 /* UTMQemuConfiguration+Arguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 848D99C328670F650055C215 /* UTMQemuConfiguration+Arguments.swift */; };
 		CEF7F6172AEEDCC400E34952 /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB63A7524F4654400CAF323 /* Main.swift */; };
 		CEF7F6192AEEDCC400E34952 /* VMCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2D954324AD4F980059923A /* VMCardView.swift */; };
+		EB572E31261E2AE949AE21E4 /* VMLineageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E265139F371CE7B5563277 /* VMLineageViews.swift */; };
 		CEF7F61A2AEEDCC400E34952 /* VMNavigationListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8432328F28C2CDAD00CFBC97 /* VMNavigationListView.swift */; };
 		CEF7F61B2AEEDCC400E34952 /* UTMSingleWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841E58CD28937FED00137A20 /* UTMSingleWindowView.swift */; };
 		CEF7F61C2AEEDCC400E34952 /* UTMLegacyQemuConfiguration+Sharing.m in Sources */ = {isa = PBXBuildFile; fileRef = CE059DC4243BFA3200338317 /* UTMLegacyQemuConfiguration+Sharing.m */; };
@@ -1871,6 +1879,7 @@
 		8471770527CC974F00D3A50B /* DefaultTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTextField.swift; sourceTree = "<group>"; };
 		8471772727CD3CAB00D3A50B /* DetailedSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedSection.swift; sourceTree = "<group>"; };
 		847BF9A92A49C783000BD9AA /* VMData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMData.swift; sourceTree = "<group>"; };
+		B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMLineageGraph.swift; sourceTree = "<group>"; };
 		84818C0B2898A07A009EDB67 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = System/Library/Frameworks/AVFAudio.framework; sourceTree = SDKROOT; };
 		848308D4278A1F2200E3E474 /* Virtualization.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Virtualization.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/System/Library/Frameworks/Virtualization.framework; sourceTree = DEVELOPER_DIR; };
 		848A98AF286A0F74006F0550 /* UTMAppleConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UTMAppleConfiguration.swift; sourceTree = "<group>"; };
@@ -2070,6 +2079,7 @@
 		CE2D954124AD4F980059923A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CE2D954224AD4F980059923A /* VMPlaceholderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMPlaceholderView.swift; sourceTree = "<group>"; };
 		CE2D954324AD4F980059923A /* VMCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMCardView.swift; sourceTree = "<group>"; };
+		D5E265139F371CE7B5563277 /* VMLineageViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMLineageViews.swift; sourceTree = "<group>"; };
 		CE2D954524AD4F980059923A /* VMRemovableDrivesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMRemovableDrivesView.swift; sourceTree = "<group>"; };
 		CE2D954624AD4F980059923A /* UTMExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UTMExtensions.swift; sourceTree = "<group>"; };
 		CE2D954724AD4F980059923A /* VMConfigSharingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VMConfigSharingView.swift; sourceTree = "<group>"; };
@@ -2895,6 +2905,7 @@
 				835AA7B026AB7C85007A0411 /* UTMPendingVirtualMachine.swift */,
 				CE611BE629F50CAD001817BC /* UTMReleaseHelper.swift */,
 				847BF9A92A49C783000BD9AA /* VMData.swift */,
+				B0436AFE5D65D2C3DE737BA4 /* VMLineageGraph.swift */,
 				16001E3BC682D8470EFCF312 /* VMSnapshotData.swift */,
 				CE550BD52259479D0063E575 /* Assets.xcassets */,
 				521F3EFB2414F73800130500 /* Localizable.strings */,
@@ -3242,6 +3253,7 @@
 				CE19392526DCB093005CEC17 /* RAMSlider.swift */,
 				84C505AB28C588EC007CE8FF /* SizeTextField.swift */,
 				CE2D954324AD4F980059923A /* VMCardView.swift */,
+				D5E265139F371CE7B5563277 /* VMLineageViews.swift */,
 				CE772AB225C8B7B500E4E379 /* VMCommands.swift */,
 				848D99A7285DB5550055C215 /* VMConfigConstantPicker.swift */,
 				CE2D953724AD4F980059923A /* VMConfigDisplayView.swift */,
@@ -4018,6 +4030,7 @@
 				8443EFFA28456F3B00B2E6E2 /* UTMQemuConfigurationSharing.swift in Sources */,
 				CE772AAC25C8B0F600E4E379 /* ContentView.swift in Sources */,
 				847BF9AA2A49C783000BD9AA /* VMData.swift in Sources */,
+				8A16BD308DC4F954A26C392E /* VMLineageGraph.swift in Sources */,
 				29B2D623BB879D2653CA8C53 /* VMSnapshotData.swift in Sources */,
 				CE2D927A24AD46670059923A /* UTMLegacyQemuConfiguration+System.m in Sources */,
 				843BF8302844853E0029D60D /* UTMQemuConfigurationNetwork.swift in Sources */,
@@ -4161,6 +4174,7 @@
 				CE88A1652E24E4C000EAA28E /* VMKeyboardMap.m in Sources */,
 				848F71E8277A2A4E006A0240 /* UTMSerialPort.swift in Sources */,
 				CE2D958F24AD4FF00059923A /* VMCardView.swift in Sources */,
+				89E3CAEF1A868A31A175164D /* VMLineageViews.swift in Sources */,
 				8432329028C2CDAD00CFBC97 /* VMNavigationListView.swift in Sources */,
 				841E58CE28937FED00137A20 /* UTMSingleWindowView.swift in Sources */,
 				CED779E52C78C82A00EB82AE /* UTMTips.swift in Sources */,
@@ -4322,6 +4336,7 @@
 				CE0B6CF624AD568400FE012D /* UTMLegacyQemuConfiguration+Drives.m in Sources */,
 				CEB20EEA282053320033EFB5 /* DoubleClickHandler.swift in Sources */,
 				CE2D956C24AD4F990059923A /* VMCardView.swift in Sources */,
+				00AA6622411386A40C75F2D2 /* VMLineageViews.swift in Sources */,
 				841E999A28AC817D003C6CB6 /* UTMQemuVirtualMachine.swift in Sources */,
 				843BF82628441EAD0029D60D /* UTMQemuConfigurationDisplay.swift in Sources */,
 				CE2D955C24AD4F980059923A /* VMConfigQEMUView.swift in Sources */,
@@ -4401,6 +4416,7 @@
 				CE9B153F2B11A63E003A32DD /* UTMRemoteServer.swift in Sources */,
 				846F8D5A2E3891FE0037162B /* UTMKeyboardShortcuts.swift in Sources */,
 				847BF9AC2A49C783000BD9AA /* VMData.swift in Sources */,
+				1C672454226E81C3803CDB99 /* VMLineageGraph.swift in Sources */,
 				A5A9A26C444286951EC315D9 /* VMSnapshotData.swift in Sources */,
 				CE25124729BFDB87000790AB /* UTMScriptingGuestProcessImpl.swift in Sources */,
 				CE2D958824AD4F990059923A /* VMConfigPortForwardForm.swift in Sources */,
@@ -4572,6 +4588,7 @@
 				CEF0304F26A2AFBF00667B63 /* BigButtonStyle.swift in Sources */,
 				84018691288A73300050AC51 /* VMDisplayViewController.m in Sources */,
 				847BF9AB2A49C783000BD9AA /* VMData.swift in Sources */,
+				170CC72ECF3084DE404AC776 /* VMLineageGraph.swift in Sources */,
 				10488F379FF913D2E7770E60 /* VMSnapshotData.swift in Sources */,
 				84909A8E27CACD5C005605F1 /* UTMPlaceholderVMView.swift in Sources */,
 				CEA45EF4263519B5002FA97D /* VMConfigSoundView.swift in Sources */,
@@ -4584,6 +4601,7 @@
 				CEA45EFC263519B5002FA97D /* Main.swift in Sources */,
 				CEBE820426A4C1B5007AAB12 /* VMWizardDrivesView.swift in Sources */,
 				CEA45F00263519B5002FA97D /* VMCardView.swift in Sources */,
+				9603DB5D487F4A5AD0702F7D /* VMLineageViews.swift in Sources */,
 				CEA45F01263519B5002FA97D /* UTMLegacyQemuConfiguration+Sharing.m in Sources */,
 				841619B328431DA5000034B2 /* UTMQemuConfigurationQEMU.swift in Sources */,
 				CEF0305C26A2AFDF00667B63 /* VMWizardOSOtherView.swift in Sources */,
@@ -4626,6 +4644,7 @@
 				CEF7F59B2AEEDCC400E34952 /* UTMQemuConfigurationSharing.swift in Sources */,
 				CEF7F59C2AEEDCC400E34952 /* ContentView.swift in Sources */,
 				CEF7F59D2AEEDCC400E34952 /* VMData.swift in Sources */,
+				FFB5FF047BC9511FAA6138E8 /* VMLineageGraph.swift in Sources */,
 				CEF7F59E2AEEDCC400E34952 /* UTMLegacyQemuConfiguration+System.m in Sources */,
 				CEF7F59F2AEEDCC400E34952 /* UTMQemuConfigurationNetwork.swift in Sources */,
 				CE70E8D52B648FBE007FA787 /* UTMRemoteSpiceVirtualMachine.swift in Sources */,
@@ -4752,6 +4771,7 @@
 				CEF7F6162AEEDCC400E34952 /* UTMQemuConfiguration+Arguments.swift in Sources */,
 				CEF7F6172AEEDCC400E34952 /* Main.swift in Sources */,
 				CEF7F6192AEEDCC400E34952 /* VMCardView.swift in Sources */,
+				EB572E31261E2AE949AE21E4 /* VMLineageViews.swift in Sources */,
 				CEF7F61A2AEEDCC400E34952 /* VMNavigationListView.swift in Sources */,
 				CEF7F61B2AEEDCC400E34952 /* UTMSingleWindowView.swift in Sources */,
 				CEF7F61C2AEEDCC400E34952 /* UTMLegacyQemuConfiguration+Sharing.m in Sources */,

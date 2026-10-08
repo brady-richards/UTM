@@ -469,6 +469,7 @@ extension UTMVirtualMachine {
 
 enum UTMVirtualMachineError: Error {
     case notImplemented
+    case imageNotRunnable
 }
 
 extension UTMVirtualMachineError: LocalizedError {
@@ -476,6 +477,8 @@ extension UTMVirtualMachineError: LocalizedError {
         switch self {
         case .notImplemented:
             return NSLocalizedString("Not implemented.", comment: "UTMVirtualMachine")
+        case .imageNotRunnable:
+            return NSLocalizedString("An image cannot be run. Create a virtual machine from it instead.", comment: "UTMVirtualMachine")
         }
     }
 }

@@ -20,6 +20,7 @@ import TipKit
 struct VMNavigationListView: View {
     @EnvironmentObject private var data: UTMData
     @State private var confirmAction: ConfirmAction?
+    @AppStorage("ShowsImageGraph") private var showsImageGraph = false
 
     var body: some View {
         if #available(iOS 16, macOS 13, *) {
@@ -50,31 +51,16 @@ struct VMNavigationListView: View {
     }
     
     @ViewBuilder private var listBody: some View {
-        ForEach(data.virtualMachines) { vm in
-            if !vm.isLoaded {
-                UTMUnavailableVMView(vm: vm)
+        Section(header: Text("Images")) {
+            if showsImageGraph {
+                graphBody
             } else {
-                if #available(iOS 16, macOS 13, visionOS 1, *) {
-                    VMCardView(vm: vm)
-                        .modifier(VMContextMenuModifier(vm: vm))
-                        .tag(vm)
-                        .swipeActions {
-                            Button(role: .destructive) {
-                                confirmAction = .confirmDeleteVM(vm: vm)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
-                } else {
-                    NavigationLink(
-                        destination: VMDetailsView(vm: vm),
-                        tag: vm,
-                        selection: $data.selectedVM,
-                        label: { VMCardView(vm: vm) })
-                    .modifier(VMContextMenuModifier(vm: vm))
-                }
+                ForEach(leaves) { vm in
+                    row(for: vm)
+                        .modifier(VMRowModifier(vm: vm, confirmAction: $confirmAction))
+                }.onMove(perform: moveLeaves)
             }
-        }.onMove(perform: move)
+        }
         .modifier(VMConfirmActionModifier(confirmAction: $confirmAction, workaroundSwipeBug: true, onConfirm: { _ in }))
 
         if data.pendingVMs.count > 0 {
@@ -86,8 +72,67 @@ struct VMNavigationListView: View {
         }
     }
     
-    private func move(fromOffsets: IndexSet, toOffset: Int) {
-        data.listMove(fromOffsets: fromOffsets, toOffset: toOffset)
+    /// VMs, and images that nothing has been derived from yet
+    private var leaves: [VMData] {
+        data.virtualMachines.filter { !$0.isImage || data.children(of: $0).isEmpty }
+    }
+
+    @ViewBuilder private var graphBody: some View {
+        let byID = Dictionary(data.virtualMachines.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        let graph = VMLineageGraph(nodes: data.virtualMachines.map(\.id)) { byID[$0]?.config?.information.parentUUID }
+        let highlighted = data.selectedVM.map { graph.ancestry(of: $0.id) } ?? []
+        ForEach(graph.rows, id: \.id) { graphRow in
+            if let vm = byID[graphRow.id] {
+                HStack(alignment: .top, spacing: 6) {
+                    VMLineageGutter(row: graphRow, laneCount: graph.laneCount, isImage: vm.isImage, highlighted: highlighted)
+                    VStack(alignment: .leading, spacing: 0) {
+                        row(for: vm)
+                        #if !WITH_REMOTE
+                        if vm.isLoaded && !vm.isImage {
+                            VMLineageSnapshots(vm: vm, list: VMSnapshotList.list(for: vm))
+                                .padding(.bottom, 6)
+                        }
+                        #endif
+                    }
+                }
+                .modifier(VMRowModifier(vm: vm, confirmAction: $confirmAction))
+                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
+            }
+        }
+    }
+
+    @ViewBuilder private func row(for vm: VMData) -> some View {
+        if !vm.isLoaded {
+            UTMUnavailableVMView(vm: vm)
+        } else {
+            if #available(iOS 16, macOS 13, visionOS 1, *) {
+                VMCardView(vm: vm)
+                    .modifier(VMContextMenuModifier(vm: vm))
+            } else {
+                NavigationLink(
+                    destination: VMDetailsView(vm: vm),
+                    tag: vm,
+                    selection: $data.selectedVM,
+                    label: { VMCardView(vm: vm) })
+                .modifier(VMContextMenuModifier(vm: vm))
+            }
+        }
+    }
+
+    /// Moves within the visible VMs, keeping hidden images where they are relative to each other
+    private func moveLeaves(fromOffsets: IndexSet, toOffset: Int) {
+        let visible = leaves
+        let all = data.virtualMachines
+        let source = IndexSet(fromOffsets.compactMap { all.firstIndex(of: visible[$0]) })
+        let destination: Int
+        if toOffset < visible.count, let index = all.firstIndex(of: visible[toOffset]) {
+            destination = index
+        } else if let last = visible.last, let index = all.firstIndex(of: last) {
+            destination = index + 1
+        } else {
+            destination = all.count
+        }
+        data.listMove(fromOffsets: source, toOffset: destination)
     }
     
     private func delete(indexSet: IndexSet) {
@@ -103,6 +148,28 @@ struct VMNavigationListView: View {
         let selected = data.pendingVMs[indexSet]
         for vm in selected {
             data.cancelDownload(for: vm)
+        }
+    }
+}
+
+/// Selection and swipe actions, which belong on the outermost view of a row
+private struct VMRowModifier: ViewModifier {
+    @ObservedObject var vm: VMData
+    @Binding var confirmAction: ConfirmAction?
+
+    func body(content: Content) -> some View {
+        if #available(iOS 16, macOS 13, visionOS 1, *), vm.isLoaded {
+            content
+                .tag(vm)
+                .swipeActions {
+                    Button(role: .destructive) {
+                        confirmAction = .confirmDeleteVM(vm: vm)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                }
+        } else {
+            content
         }
     }
 }
@@ -126,6 +193,7 @@ private struct CompatibleNavigationSplitView<Sidebar, Detail> : View where Sideb
 
 private struct VMListModifier: ViewModifier {
     @EnvironmentObject private var data: UTMData
+    @AppStorage("ShowsImageGraph") private var showsImageGraph = false
     @State private var settingsPresented = false
     @State private var sheetPresented = false
     @State private var donatePresented = false
@@ -167,6 +235,9 @@ private struct VMListModifier: ViewModifier {
             #if os(macOS)
             ToolbarItem(placement: .navigation) {
                 newButton
+            }
+            ToolbarItem(placement: .navigation) {
+                graphButton
             }
             #else
             #if !WITH_REMOTE // FIXME: implement remote feature
@@ -219,6 +290,9 @@ private struct VMListModifier: ViewModifier {
                 }
             }
             #endif
+            ToolbarItem(placement: .navigationBarTrailing) {
+                graphButton
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
             }
@@ -285,6 +359,15 @@ private struct VMListModifier: ViewModifier {
         #endif
     }
     
+    private var graphButton: some View {
+        Button {
+            showsImageGraph.toggle()
+        } label: {
+            Label(showsImageGraph ? "Hide Image Graph" : "Show Image Graph", systemImage: "arrow.triangle.branch")
+                .labelStyle(.iconOnly)
+        }.help(showsImageGraph ? "Show only the VMs and images that can be used." : "Show every image and what was created from it.")
+    }
+
     private var newButton: some View {
         Button(action: { data.newVM() }, label: {
             Label("New VM", systemImage: "plus").labelStyle(.iconOnly)
