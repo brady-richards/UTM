@@ -138,13 +138,15 @@ struct VMToolbarModifier: ViewModifier {
                 }
                 #endif
                 Button {
-                    data.close(vm: vm) // close window
+                    if vm.settingsLockReason == nil {
+                        data.close(vm: vm) // close window
+                    }
                     data.edit(vm: vm)
                 } label: {
                     Label("Edit", systemImage: "slider.horizontal.3")
                         .labelStyle(.iconOnly)
                 }.help("Edit selected VM")
-                .disabled(vm.hasSuspendState || !vm.isModifyAllowed)
+                .disabled(vm.isImage)
                 .padding(.leading, padding)
                 #endif
             }

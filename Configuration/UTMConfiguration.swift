@@ -163,6 +163,31 @@ extension UTMConfiguration {
         try settingsData.write(to: packageURL.appendingPathComponent(kUTMBundleConfigFilename))
     }
     
+    /// Replace the notes in a saved configuration without touching anything else in the bundle
+    ///
+    /// Safe while the VM is running, unlike `save(to:)` which also writes and cleans up its data.
+    /// - Parameters:
+    ///   - notes: New notes, `nil` to remove them
+    ///   - packageURL: Bundle to update
+    static func saveNotes(_ notes: String?, to packageURL: URL) throws {
+        let scopedAccess = packageURL.startAccessingSecurityScopedResource()
+        defer {
+            if scopedAccess {
+                packageURL.stopAccessingSecurityScopedResource()
+            }
+        }
+        let configURL = packageURL.appendingPathComponent(kUTMBundleConfigFilename)
+        var format = PropertyListSerialization.PropertyListFormat.xml
+        guard var plist = try PropertyListSerialization.propertyList(from: Data(contentsOf: configURL), format: &format) as? [String: Any],
+              var information = plist["Information"] as? [String: Any] else {
+            // a legacy configuration has to be saved in full to be converted
+            throw UTMConfigurationError.invalidConfigurationValue("Information")
+        }
+        information["Notes"] = notes
+        plist["Information"] = information
+        try PropertyListSerialization.data(fromPropertyList: plist, format: format, options: 0).write(to: configURL, options: .atomic)
+    }
+
     /// Check if a file has changed and if so, copy the new file to the bundle
     /// - Parameters:
     ///   - sourceURL: File to copy

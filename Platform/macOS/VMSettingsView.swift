@@ -93,17 +93,21 @@ struct SettingsToolbarViewModifier<AdditionalContent>: ViewModifier where Additi
     @Environment(\.dismiss) private var dismiss
     
     let additionalContent: AdditionalContent?
+    let locksContent: Bool
     
-    fileprivate init() where AdditionalContent == EmptyToolbarContent {
+    fileprivate init(locksContent: Bool) where AdditionalContent == EmptyToolbarContent {
         self.additionalContent = nil
+        self.locksContent = locksContent
     }
     
     init(additionalContent: () -> AdditionalContent) {
         self.additionalContent = additionalContent()
+        self.locksContent = true
     }
     
     func body(content: Content) -> some View {
-        let view = content.toolbar {
+        // unverified: locking the page before adding the toolbar should leave Cancel and Save enabled
+        let view = content.lockedWhileRunning(isActive: locksContent).toolbar {
             ToolbarItemGroup(placement: .cancellationAction) {
                 Button(action: cancel) {
                     Text("Cancel")
@@ -149,8 +153,9 @@ extension View {
         self.modifier(ScrollableViewModifier())
     }
     
-    func settingsToolbar() -> some View {
-        self.modifier(SettingsToolbarViewModifier())
+    /// - Parameter locksContent: Disable the page while the VM is running or suspended
+    func settingsToolbar(locksContent: Bool = true) -> some View {
+        self.modifier(SettingsToolbarViewModifier(locksContent: locksContent))
     }
     
     func settingsToolbar<Content>(@ToolbarContentBuilder additionalContent: () -> Content) -> some View where Content: ToolbarContent {

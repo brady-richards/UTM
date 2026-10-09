@@ -46,6 +46,7 @@ struct VMConfigInfoView: View {
             HStack {
                 Text("Name").frame(width: 50, alignment: .trailing)
                 nameField
+                    .lockedWhileRunning()
             }
             HStack(alignment: .top) {
                 Text("Notes").frame(width: 50, alignment: .trailing)
@@ -55,19 +56,24 @@ struct VMConfigInfoView: View {
                 Text("Icon").frame(width: 50, alignment: .trailing)
                 iconSelector
                     .aspectRatio(1, contentMode: .fill)
+                    .lockedWhileRunning()
                 iconStylePicker
+                    .lockedWhileRunning()
             }
             #else
             Form {
                 Section(header: Text("Name")) {
                     nameField
+                        .lockedWhileRunning()
                 }
                 Section(header: Text("Notes")) {
                     notesField
                 }
                 Section(header: Text("Icon")) {
                     iconStylePicker
+                        .lockedWhileRunning()
                     iconSelector
+                        .lockedWhileRunning()
                 }
             }
             #endif

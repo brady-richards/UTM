@@ -30,7 +30,7 @@ struct VMAppleSettingsView: View {
     }
     
     var body: some View {
-        NavigationLink(destination: VMConfigInfoView(config: $config.information).scrollable().settingsToolbar(), isActive: $infoActive) {
+        NavigationLink(destination: VMConfigInfoView(config: $config.information).scrollable().settingsToolbar(locksContent: false), isActive: $infoActive) {
             Label("Information", systemImage: "info.circle")
         }
         NavigationLink {
@@ -74,7 +74,7 @@ struct VMAppleSettingsView: View {
                                     Button("Remove") {
                                         config.displays.removeAll(where: { $0.id == display.id })
                                         refresh()
-                                    }
+                                    }.lockedWhileRunning()
                                 }
                             }
                     } label: {
@@ -83,7 +83,7 @@ struct VMAppleSettingsView: View {
                         DestructiveButton("Remove") {
                             config.displays.removeAll(where: { $0.id == display.id })
                             refresh()
-                        }
+                        }.lockedWhileRunning()
                     }
                 }
             }
@@ -96,7 +96,7 @@ struct VMAppleSettingsView: View {
                                 Button("Remove") {
                                     config.serials.removeAll(where: { $0.id == serial.id })
                                     refresh()
-                                }
+                                }.lockedWhileRunning()
                             }
                         }
                 } label: {
@@ -105,7 +105,7 @@ struct VMAppleSettingsView: View {
                     DestructiveButton("Remove") {
                         config.serials.removeAll(where: { $0.id == serial.id })
                         refresh()
-                    }
+                    }.lockedWhileRunning()
                 }
             }
             ForEach($config.networks) { $network in
@@ -117,7 +117,7 @@ struct VMAppleSettingsView: View {
                                 Button("Remove") {
                                     config.networks.removeAll(where: { $0.id == network.id })
                                     refresh()
-                                }
+                                }.lockedWhileRunning()
                             }
                         }
                 } label: {
@@ -126,7 +126,7 @@ struct VMAppleSettingsView: View {
                     DestructiveButton("Remove") {
                         config.networks.removeAll(where: { $0.id == network.id })
                         refresh()
-                    }
+                    }.lockedWhileRunning()
                 }
             }
             VMAppleSettingsAddDeviceMenuView(config: config)

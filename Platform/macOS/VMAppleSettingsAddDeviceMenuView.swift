@@ -51,7 +51,7 @@ struct VMAppleSettingsAddDeviceMenuView: View {
             }
         } label: {
             Label("New…", systemImage: "plus")
-        }.help("Add a new device.")
+        }.lockedWhileRunning(help: "Add a new device.")
         .addDeviceMenuStyle()
     }
 }

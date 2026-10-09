@@ -39,7 +39,7 @@ struct VMSettingsView: View {
                                 .labelStyle(.roundRectIcon)
                         })
                     NavigationLink(
-                        destination: VMConfigSystemView(config: $config.system, isResetConfig: $isResetConfig).navigationTitle("System"),
+                        destination: VMConfigSystemView(config: $config.system, isResetConfig: $isResetConfig).navigationTitle("System").lockedWhileRunning(),
                         label: {
                             Label("System", systemImage: "cpu")
                                 .labelStyle(.roundRectIcon)
@@ -51,19 +51,19 @@ struct VMSettingsView: View {
                         }
                     }
                     NavigationLink(
-                        destination: VMConfigQEMUView(config: config).navigationTitle("QEMU"),
+                        destination: VMConfigQEMUView(config: config).navigationTitle("QEMU").lockedWhileRunning(),
                         label: {
                             Label("QEMU", systemImage: "shippingbox")
                                 .labelStyle(.roundRectIcon)
                         })
                     NavigationLink(
-                        destination: VMConfigInputView(config: $config.input, hasUsbSupport: config.system.architecture.hasUsbSupport).navigationTitle("Input"),
+                        destination: VMConfigInputView(config: $config.input, hasUsbSupport: config.system.architecture.hasUsbSupport).navigationTitle("Input").lockedWhileRunning(),
                         label: {
                             Label("Input", systemImage: "keyboard")
                                 .labelStyle(.roundRectIcon)
                         })
                     NavigationLink(
-                        destination: VMConfigSharingView(config: $config.sharing).navigationTitle("Sharing"),
+                        destination: VMConfigSharingView(config: $config.sharing).navigationTitle("Sharing").lockedWhileRunning(),
                         label: {
                             Label("Sharing", systemImage: "person.crop.circle")
                                 .labelStyle(.roundRectIcon)
@@ -79,6 +79,7 @@ struct VMSettingsView: View {
                 VMSettingsAddDeviceMenuView(config: config, isCreateDriveShown: $devicesState.isCreateDriveShown, isImportDriveShown: $devicesState.isImportDriveShown)
             }, editContent: {
                 EditButton()
+                    .lockedWhileRunning()
             }, cancelContent: {
                 Button(action: cancel) {
                     Text("Cancel")
@@ -90,6 +91,7 @@ struct VMSettingsView: View {
             })
             .fileImporter(isPresented: $globalFileImporterShim.isPresented, allowedContentTypes: globalFileImporterShim.allowedContentTypes, onCompletion: globalFileImporterShim.onCompletion)
         }.environmentObject(globalFileImporterShim)
+        .environmentObject(vm)
         .disabled(data.busy)
         .overlay(BusyOverlay())
     }
@@ -124,41 +126,46 @@ private class DevicesState: ObservableObject {
 private struct Devices: View {
     @ObservedObject var config: UTMQemuConfiguration
     @ObservedObject var state: DevicesState
+    @EnvironmentObject private var vm: VMData
     
     var body: some View {
         Section(header: Text("Devices")) {
             ForEach($config.displays) { $display in
-                NavigationLink(destination: VMConfigDisplayView(config: $display, system: $config.system).navigationTitle("Display")) {
+                NavigationLink(destination: VMConfigDisplayView(config: $display, system: $config.system).navigationTitle("Display").lockedWhileRunning()) {
                     Label("Display", systemImage: "rectangle.on.rectangle")
                         .labelStyle(RoundRectIconLabelStyle(color: .green))
                 }
             }.onDelete { offsets in
                 config.displays.remove(atOffsets: offsets)
             }
+            .deleteDisabled(vm.settingsLockReason != nil)
             ForEach($config.serials) { $serial in
-                NavigationLink(destination: VMConfigSerialView(config: $serial, system: $config.system).navigationTitle("Serial")) {
+                NavigationLink(destination: VMConfigSerialView(config: $serial, system: $config.system).navigationTitle("Serial").lockedWhileRunning()) {
                     Label("Serial", systemImage: "rectangle.connected.to.line.below")
                         .labelStyle(RoundRectIconLabelStyle(color: .green))
                 }
             }.onDelete { offsets in
                 config.serials.remove(atOffsets: offsets)
             }
+            .deleteDisabled(vm.settingsLockReason != nil)
             ForEach($config.networks) { $network in
-                NavigationLink(destination: VMConfigNetworkView(config: $network, system: $config.system).navigationTitle("Network")) {
+                NavigationLink(destination: VMConfigNetworkView(config: $network, system: $config.system).navigationTitle("Network").lockedWhileRunning()) {
                     Label("Network", systemImage: "network")
                         .labelStyle(RoundRectIconLabelStyle(color: .green))
                 }
             }.onDelete { offsets in
                 config.networks.remove(atOffsets: offsets)
             }
+            .deleteDisabled(vm.settingsLockReason != nil)
             ForEach($config.sound) { $sound in
-                NavigationLink(destination: VMConfigSoundView(config: $sound, system: $config.system).navigationTitle("Sound")) {
+                NavigationLink(destination: VMConfigSoundView(config: $sound, system: $config.system).navigationTitle("Sound").lockedWhileRunning()) {
                     Label("Sound", systemImage: "speaker.wave.2")
                         .labelStyle(RoundRectIconLabelStyle(color: .green))
                 }
             }.onDelete { offsets in
                 config.sound.remove(atOffsets: offsets)
             }
+            .deleteDisabled(vm.settingsLockReason != nil)
         }
         Section(header: Text("Drives")) {
             VMDrivesSettingsView(config: config, isCreateDriveShown: $state.isCreateDriveShown, isImportDriveShown: $state.isImportDriveShown)

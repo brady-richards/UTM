@@ -21,6 +21,7 @@ struct VMDrivesSettingsView<Drive: UTMConfigurationDrive>: View {
     let template: Drive
     @State var newDrive: Drive
     @EnvironmentObject private var data: UTMData
+    @EnvironmentObject private var vm: VMData
     @State private var newDrivePopover: Bool = false
     @State private var importDrivePresented: Bool = false
     @State private var requestDriveDelete: Drive?
@@ -41,7 +42,7 @@ struct VMDrivesSettingsView<Drive: UTMConfigurationDrive>: View {
                         ToolbarItem(placement: .destructiveAction) {
                             Button("Delete") {
                                 requestDriveDelete = drive
-                            }
+                            }.lockedWhileRunning()
                         }
                     }
             } label: {
@@ -49,25 +50,26 @@ struct VMDrivesSettingsView<Drive: UTMConfigurationDrive>: View {
             }.contextMenu {
                 DestructiveButton("Delete") {
                     requestDriveDelete = drive
-                }
+                }.lockedWhileRunning()
                 if driveIndex != 0 {
                     Button {
                         drives.move(fromOffsets: IndexSet(integer: driveIndex), toOffset: driveIndex - 1)
                     } label: {
                         Label("Move Up", systemImage: "chevron.up")
-                    }
+                    }.lockedWhileRunning()
                 }
                 if driveIndex != drives.count - 1 {
                     Button {
                         drives.move(fromOffsets: IndexSet(integer: driveIndex), toOffset: driveIndex + 2)
                     } label: {
                         Label("Move Down", systemImage: "chevron.down")
-                    }
+                    }.lockedWhileRunning()
                 }
             }
         }.onMove { offsets, index in
             drives.move(fromOffsets: offsets, toOffset: index)
         }
+        .moveDisabled(vm.settingsLockReason != nil)
         .alert(item: $requestDriveDelete) { drive in
             Alert(title: Text("Are you sure you want to permanently delete this disk image?"), primaryButton: .destructive(Text("Delete")) {
                 drives.removeAll(where: { $0 == drive })
@@ -79,7 +81,7 @@ struct VMDrivesSettingsView<Drive: UTMConfigurationDrive>: View {
             Label("New…", systemImage: "externaldrive.badge.plus")
         }
         .buttonStyle(.borderless)
-        .help("Add a new drive.")
+        .lockedWhileRunning(help: "Add a new drive.")
         .fileImporter(isPresented: $importDrivePresented, allowedContentTypes: [.item], onCompletion: importDrive)
         .onChange(of: newDrivePopover, perform: { showPopover in
             if showPopover {

@@ -433,7 +433,12 @@ enum AlertItem: Identifiable {
     /// - Parameter vm: VM to save
     func save(vm: VMData) async throws {
         do {
-            try await vm.save()
+            if vm.settingsLockReason != nil {
+                // only the notes can be edited while the VM is running or suspended
+                try UTMQemuConfiguration.saveNotes(vm.config?.information.notes, to: vm.pathUrl)
+            } else {
+                try await vm.save()
+            }
             #if WITH_SERVER
             if let qemuConfig = vm.config as? UTMQemuConfiguration {
                 await remoteServer.broadcast { remote in
@@ -464,6 +469,12 @@ enum AlertItem: Identifiable {
     /// Discard changes to VM configuration
     /// - Parameter vm: VM configuration to discard
     func discardChanges(for vm: VMData) throws {
+        if vm.settingsLockReason != nil {
+            // reloading would replace the configuration a running VM is using, and only the notes can differ
+            let saved = try UTMQemuConfiguration.load(from: vm.pathUrl)
+            updateInformation(of: vm) { $0.notes = saved.information.notes }
+            return
+        }
         if let wrapped = vm.wrapped {
             try wrapped.reload(from: nil)
             if uuidHasCollision(with: vm) {

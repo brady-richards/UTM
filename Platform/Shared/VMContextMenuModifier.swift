@@ -44,11 +44,13 @@ struct VMContextMenuModifier: ViewModifier {
             #endif
             #if !WITH_REMOTE // FIXME: implement remote feature
             Button {
-                data.close(vm: vm) // close window
+                if vm.settingsLockReason == nil {
+                    data.close(vm: vm) // close window
+                }
                 data.edit(vm: vm)
             } label: {
                 Label("Edit", systemImage: "slider.horizontal.3")
-            }.disabled(vm.hasSuspendState || !vm.isModifyAllowed || vm.isImage)
+            }.disabled(vm.isImage)
             .help("Modify settings for this VM.")
             #endif
             if vm.isImage {

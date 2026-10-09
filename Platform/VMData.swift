@@ -330,6 +330,17 @@ extension VMData {
     var hasSuspendState: Bool {
         registryEntry?.isSuspended ?? false
     }
+
+    /// Why settings other than the notes cannot be changed right now, `nil` if they can
+    var settingsLockReason: String? {
+        if hasSuspendState {
+            return NSLocalizedString("Disabled on a suspended VM", comment: "VMData")
+        } else if !isModifyAllowed {
+            return NSLocalizedString("Disabled on a running VM", comment: "VMData")
+        } else {
+            return nil
+        }
+    }
 }
 
 // MARK: - Home UI elements

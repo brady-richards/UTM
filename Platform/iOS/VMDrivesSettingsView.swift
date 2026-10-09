@@ -24,27 +24,30 @@ struct VMDrivesSettingsView: View {
     @Binding var isImportDriveShown: Bool
     @State private var attemptDelete: IndexSet?
     @EnvironmentObject private var data: UTMData
+    @EnvironmentObject private var vm: VMData
     
     var body: some View {
         ForEach($config.drives) { $drive in
             NavigationLink(
-                destination: VMConfigDriveDetailsView(config: $drive), label: {
+                destination: VMConfigDriveDetailsView(config: $drive).lockedWhileRunning(), label: {
                     Label(title: { labelTitle(for: drive) }, icon: { Image(systemName: "externaldrive") })
                 })
         }.onDelete { offsets in
             attemptDelete = offsets
         }
         .onMove(perform: moveDrives)
+        .deleteDisabled(vm.settingsLockReason != nil)
+        .moveDisabled(vm.settingsLockReason != nil)
         Button {
             isImportDriveShown.toggle()
         } label: {
             Text("Import Drive…")
-        }
+        }.lockedWhileRunning()
         Button {
             isCreateDriveShown.toggle()
         } label: {
             Text("New Drive…")
-        }
+        }.lockedWhileRunning()
         .sheet(isPresented: $isCreateDriveShown) {
             CreateDrive(newDrive: UTMQemuConfigurationDrive(forArchitecture: config.system.architecture, target: config.system.target), onDismiss: newDrive)
         }
