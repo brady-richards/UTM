@@ -167,6 +167,7 @@ struct VMDetailsView: View {
                         .frame(maxWidth: .infinity)
                     Text(notes)
                         .font(.body)
+                        .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .topLeading)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding([.leading, .trailing])
@@ -190,6 +191,7 @@ struct VMDetailsView: View {
                     if !notes.isEmpty {
                         Text(notes)
                             .font(.body)
+                            .textSelection(.enabled)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     #if os(macOS)
